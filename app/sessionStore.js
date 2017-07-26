@@ -675,6 +675,28 @@ module.exports.runPreMigrations = (data) => {
 }
 
 module.exports.runPostMigrations = (data) => {
+  // fingerprinting protection migration
+  if (typeof data.settings['privacy.block-canvas-fingerprinting'] !== 'boolean') {
+    return data
+  }
+  try {
+    const siteSettings = data.siteSettings
+    if (siteSettings) {
+      for (let host in siteSettings) {
+        if (siteSettings[host].fingerprintingProtection === true) {
+          siteSettings[host].fingerprintingProtection = 'blockAllFingerprinting'
+        } else if (siteSettings[host].fingerprintingProtection === false) {
+          siteSettings[host].fingerprintingProtection = 'allowAllFingerprinting'
+        }
+      }
+    }
+    data['fingerprintingProtectionAll'] = {
+      enabled: data.settings['privacy.block-canvas-fingerprinting']
+    }
+    delete data.settings['privacy.block-canvas-fingerprinting']
+  } catch (e) {
+    console.log('fingerprinting protection migration failed', e)
+  }
   return data
 }
 

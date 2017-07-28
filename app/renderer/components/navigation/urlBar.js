@@ -37,14 +37,15 @@ const {eventElHasAncestorWithClasses, isForSecondaryAction} = require('../../../
 const {getBaseUrl, isUrl} = require('../../../../js/lib/appUrlUtil')
 const {getCurrentWindowId} = require('../../currentWindow')
 const {normalizeLocation, getNormalizedSuggestion} = require('../../../common/lib/suggestion')
-const isDarwin = require('../../../common/lib/platformUtil').isDarwin()
+const platformUtil = require('../../../common/lib/platformUtil')
 const publisherUtil = require('../../../common/lib/publisherUtil')
 const historyUtil = require('../../../common/lib/historyUtil')
-const isWindows = require('../../../common/lib/platformUtil').isWindows()
+
+const isDarwin = platformUtil.isDarwin()
+const isWindows = platformUtil.isWindows()
 
 // Styles
 const iconNoScript = require('../../../../img/url-bar-no-script.svg')
-
 const globalStyles = require('../styles/global')
 
 class UrlBar extends React.Component {

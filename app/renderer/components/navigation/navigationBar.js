@@ -30,17 +30,13 @@ const frameStateUtil = require('../../../../js/state/frameStateUtil')
 // Utils
 const cx = require('../../../../js/lib/classSet')
 const {getBaseUrl} = require('../../../../js/lib/appUrlUtil')
-const eventUtil = require('../../../../js/lib/eventUtil')
 const {getSetting} = require('../../../../js/settings')
-const contextMenus = require('../../../../js/contextMenus')
 const bookmarkLocationCache = require('../../../common/cache/bookmarkLocationCache')
 const platformUtil = require('../../../common/lib/platformUtil')
-const {isFullScreen} = require('../../currentWindow')
+const isDarwin = platformUtil.isDarwin()
 
 // Styles
 const globalStyles = require('../styles/global')
-
-const isDarwin = platformUtil.isDarwin()
 
 class NavigationBar extends React.Component {
   mergeProps (state, ownProps) {

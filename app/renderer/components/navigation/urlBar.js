@@ -6,6 +6,7 @@ const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
 const Immutable = require('immutable')
 const ipc = require('electron').ipcRenderer
+const emojiRegex = require('emoji-regex')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
@@ -39,11 +40,10 @@ const {normalizeLocation, getNormalizedSuggestion} = require('../../../common/li
 const isDarwin = require('../../../common/lib/platformUtil').isDarwin()
 const publisherUtil = require('../../../common/lib/publisherUtil')
 const historyUtil = require('../../../common/lib/historyUtil')
-const {isWindows} = require('../../../common/lib/platformUtil')
+const isWindows = require('../../../common/lib/platformUtil').isWindows()
 
-// Icons
+// Styles
 const iconNoScript = require('../../../../img/url-bar-no-script.svg')
-const emojiRegex = require('emoji-regex')
 
 const globalStyles = require('../styles/global')
 
@@ -392,24 +392,6 @@ class UrlBar extends React.Component {
     return ''
   }
 
-  get URLBarIcon () {
-    return <NavigationBarButtonContainer isSquare>
-      <UrlBarIcon
-        activateSearchEngine={this.props.activateSearchEngine}
-        active={this.props.isActive}
-        isSecure={this.props.isSecure}
-        isHTTPPage={this.props.isHTTPPage}
-        loading={this.props.loading}
-        location={this.props.location}
-        searchSelectEntry={this.props.searchSelectEntry}
-        title={this.props.title}
-        titleMode={this.props.titleMode}
-        isSearching={this.props.location !== this.props.urlbarLocation}
-        activeTabShowingMessageBox={this.props.activeTabShowingMessageBox}
-      />
-    </NavigationBarButtonContainer>
-  }
-
   // BEM Level: urlbarForm__titleBar
   get titleBar () {
     return <div id='titleBar' data-test-id='titleBar' className={css(styles.titleBar)}>
@@ -436,7 +418,7 @@ class UrlBar extends React.Component {
       data-test-id='urlInput'
       className={cx({
         private: this.private,
-        [css(styles.input, this.props.isWindows && styles.input_windows)]: true
+        [css(styles.input, isWindows && styles.input_windows)]: true
       })}
       readOnly={this.props.titleMode}
       ref={(node) => { this.urlInput = node }}
@@ -526,7 +508,6 @@ class UrlBar extends React.Component {
     props.activeFrameKey = activeFrame.get('key')
     props.urlbarLocation = urlbarLocation
     props.isFocused = urlbar.get('focused')
-    props.isWindows = isWindows()
     props.frameLocation = frameLocation
     props.isSelected = urlbar.get('selected')
     props.noScriptIsVisible = currentWindow.getIn(['ui', 'noScriptInfo', 'isVisible'], false)
@@ -553,7 +534,9 @@ class UrlBar extends React.Component {
       })}
       action='#'
       id='urlbar'>
-      {this.URLBarIcon}
+      <NavigationBarButtonContainer isSquare>
+        <UrlBarIcon titleMode={this.props.titleMode} />
+      </NavigationBarButtonContainer>
       {
         !this.props.titleMode
         ? this.input

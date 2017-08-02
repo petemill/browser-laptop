@@ -315,9 +315,7 @@ function windowDefaults () {
     webPreferences: {
       // XXX: Do not edit without security review
       sharedWorker: true,
-      partition: 'default',
-      allowFileAccessFromFileUrls: true,
-      allowUniversalAccessFromFileUrls: true
+      partition: 'default'
     }
   }
 }

@@ -57,6 +57,51 @@ const registeredSessions = {}
  */
 const permissionCallbacks = {}
 
+/**
+ * Cache of URLs mapped their site settings.
+ * This gets rebuilt when site settings or a bravery setting is changed.
+ */
+let braverySettingsForUrl = {}
+
+const getBraverySettingsForUrl = (url, appState, isPrivate) => {
+  if (braverySettingsForUrl[url]) {
+    return braverySettingsForUrl[url]
+  }
+  const savedSettings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
+  const tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), url)
+
+  let braverySettings = siteSettings.activeSettings(savedSettings, appState, appConfig)
+  if (isPrivate && tempSettings) {
+    braverySettings = siteSettings.activeSettings(tempSettings, appState, appConfig)
+  }
+  braverySettingsForUrl[url] = braverySettings
+  return braverySettings
+}
+
+const settingsKeys = ['siteSettings', 'temporarySiteSettings', 'settings']
+const appStoreChangeCallback = function (diffs) {
+  if (!diffs) {
+    return
+  }
+  diffs.forEach((diff) => {
+    if (!diff || !diff.path) {
+      return
+    }
+    const path = diff.path.split('/')
+    if (path.length < 2) {
+      // We are looking for paths like ['', 'siteSettings']
+      return
+    }
+
+    const type = path[1]
+    if (settingsKeys.includes(type) ||
+      (path[2] === 'enabled' && appConfig.resourceNames.includes(type))) {
+      // Rebuild bravery settings cache
+      braverySettingsForUrl = {}
+    }
+  })
+}
+
 module.exports.registerBeforeSendHeadersFilteringCB = (filteringFn) => {
   beforeSendHeadersFilteringFns.push(filteringFn)
 }
@@ -684,6 +729,7 @@ module.exports.init = (state, action, store) => {
       permissionCallbacks[message](buttonIndex, persist)
     }
   })
+  appStore.addChangeListener(appStoreChangeCallback)
 
   return state
 }
@@ -716,28 +762,22 @@ module.exports.isResourceEnabled = (resourceName, url, isPrivate) => {
   if (resourceName === 'flash') {
     return true
   }
+  const appState = appStore.getState()
+  const settingsState = appState.get('settings')
 
   if (resourceName === 'pdfjs') {
-    return getSetting(settings.PDFJS_ENABLED)
+    return getSetting(settings.PDFJS_ENABLED, settingsState)
   }
   if (resourceName === 'webtorrent') {
-    return getSetting(settings.TORRENT_VIEWER_ENABLED)
+    return getSetting(settings.TORRENT_VIEWER_ENABLED, settingsState)
   }
-
-  const appState = appStore.getState()
 
   if (resourceName === 'webtorrent') {
     const extension = extensionState.getExtensionById(appState, config.torrentExtensionId)
     return extension !== undefined ? extension.get('enabled') : false
   }
 
-  const savedSettings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
-  const tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), url)
-
-  let braverySettings = siteSettings.activeSettings(savedSettings, appState, appConfig)
-  if (isPrivate && tempSettings) {
-    braverySettings = siteSettings.activeSettings(tempSettings, appState, appConfig)
-  }
+  const braverySettings = getBraverySettingsForUrl(url, appState, isPrivate)
 
   // If full shields are down never enable extra protection
   if (braverySettings.shieldsUp === false) {

@@ -15,6 +15,32 @@ if (isWindows) {
     arch = 'ia32'
   }
 }
+
+const channel = process.env.CHANNEL
+
+var channels = { nightly: true, dev: true, beta: true, release: true }
+if (!channels[channel]) {
+  throw new Error('CHANNEL environment variable must be set to dev, beta or release')
+}
+
+var appName
+switch (channel) {
+  case 'nightly':
+    appName = 'Brave-Nightly'
+    break
+  case 'dev':
+    appName = 'Brave-Developer'
+    break
+  case 'beta':
+    appName = 'Brave-Beta'
+    break
+  case 'release':
+    appName = 'Brave'
+    break
+  default:
+    throw new Error('CHANNEL environment variable must be set to dev, beta or release')
+}
+
 const buildDir = 'Brave-' + process.platform + '-' + arch
 
 console.log('Building install and update for version ' + VersionInfo.braveVersion + ' in ' + buildDir + ' with Electron ' + VersionInfo.electronVersion)
@@ -28,23 +54,23 @@ if (isDarwin) {
 
   cmds = [
     // Remove old
-    'rm -f ' + outDir + '/Brave.dmg',
+    'rm -f ' + outDir + `/${appName}.dmg`,
 
     // Sign it
-    'cd ' + buildDir + '/Brave.app/Contents/Frameworks',
+    'cd ' + buildDir + `/${appName}.app/Contents/Frameworks`,
     'codesign --deep --force --strict --verbose --sign $IDENTIFIER *',
     'cd ../../..',
-    'codesign --deep --force --strict --verbose --sign $IDENTIFIER Brave.app/',
+    `codesign --deep --force --strict --verbose --sign $IDENTIFIER ${appName}.app/`,
 
     // Package it into a dmg
     'cd ..',
     'build ' +
-      '--prepackaged="' + buildDir + '/Brave.app" ' +
+      '--prepackaged="' + buildDir + `/${appName}.app" ` +
       '--mac=dmg ' +
-      ' --config=res/builderConfig.json ',
+      ` --config=res/${channel}/builderConfig.json `,
 
     // Create an update zip
-    'ditto -c -k --sequesterRsrc --keepParent ' + buildDir + '/Brave.app dist/Brave-' + VersionInfo.braveVersion + '.zip'
+    'ditto -c -k --sequesterRsrc --keepParent ' + buildDir + `/${appName}.app dist/${appName}-` + VersionInfo.braveVersion + '.zip'
   ]
   execute(cmds, {}, console.log.bind(null, 'done'))
 } else if (isWindows) {
@@ -64,18 +90,18 @@ if (isDarwin) {
   var resultPromise = muonInstaller.createWindowsInstaller({
     appDirectory: buildDir,
     outputDirectory: outDir,
-    title: 'Brave',
+    title: appName,
     authors: 'Brave Software',
     loadingGif: 'res/brave_splash_installing.gif',
     setupIcon: 'res/brave_installer.ico',
     iconUrl: 'https://brave.com/favicon.ico',
     signWithParams: format('-a -fd sha256 -f "%s" -p "%s" -t http://timestamp.verisign.com/scripts/timstamp.dll', path.resolve(cert), certPassword),
     noMsi: true,
-    exe: 'Brave.exe'
+    exe: `${appName}.exe`
   })
   resultPromise.then(() => {
     cmds = [
-      `mv ${outDir}/Setup.exe ${outDir}/BraveSetup-${arch}.exe`
+      `mv ${outDir}/Setup.exe ${outDir}/${appName}Setup-${arch}.exe`
     ]
     execute(cmds, {}, console.log.bind(null, 'done'))
   }, (e) => console.log(`No dice: ${e.message}`))
@@ -85,18 +111,18 @@ if (isDarwin) {
   cmds = [
     // .deb file
     'electron-installer-debian' +
-      ' --src Brave-linux-x64/' +
+      ` --src ${appName}-linux-x64/` +
       ' --dest dist/' +
       ' --arch amd64' +
       ' --config res/linuxPackaging.json',
     // .rpm file
     'electron-installer-redhat' +
-      ' --src Brave-linux-x64/' +
+      ` --src ${appName}-linux-x64/` +
       ' --dest dist/' +
       ' --arch x86_64' +
       ' --config res/linuxPackaging.json',
     // .tar.bz2 file
-    'tar -jcvf dist/Brave.tar.bz2 ./Brave-linux-x64'
+    `tar -jcvf dist/${appName}.tar.bz2 ./${appName}-linux-x64`
   ]
   execute(cmds, {}, (err) => {
     if (err) {

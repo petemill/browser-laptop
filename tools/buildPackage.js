@@ -13,34 +13,59 @@ const isDarwin = process.platform === 'darwin'
 var arch = 'x64'
 const isLinux = process.platform === 'linux'
 
-var appIcon
-if (isWindows) {
-  appIcon = 'res/app.ico'
-  if (process.env.TARGET_ARCH === 'ia32') {
-    arch = 'ia32'
-  }
-} else if (isDarwin) {
-  appIcon = 'res/app.icns'
-} else {
-  appIcon = 'res/app.png'
-}
-
-const buildDir = 'Brave-' + process.platform + '-' + arch
-
 var env = {
   NODE_ENV: 'production',
   CHANNEL: process.env.CHANNEL
 }
 
-var channels = { dev: true, beta: true, stable: true }
-if (!channels[env.CHANNEL]) {
-  throw new Error('CHANNEL environment variable must be set to dev, beta or stable')
+const channel = env.CHANNEL
+
+var channels = { nightly: true, dev: true, beta: true, release: true }
+if (!channels[channel]) {
+  throw new Error('CHANNEL environment variable must be set to dev, beta or release')
 }
+
+var appIcon
+if (isWindows) {
+  appIcon = `res/${channel}/app.ico`
+  if (process.env.TARGET_ARCH === 'ia32') {
+    arch = 'ia32'
+  }
+} else if (isDarwin) {
+  appIcon = `res/${channel}/app.icns`
+} else {
+  appIcon = `res/${channel}/app.png`
+}
+
+var appName
+switch (channel) {
+  case 'nightly':
+    appName = 'Brave-Nightly'
+    break
+  case 'dev':
+    appName = 'Brave-Developer'
+    break
+  case 'beta':
+    appName = 'Brave-Beta'
+    break
+  case 'release':
+    appName = 'Brave'
+    break
+  default:
+    throw new Error('CHANNEL environment variable must be set to dev, beta or release')
+}
+
+var productDirName = 'brave'
+if (channel !== 'release') {
+  productDirName += `-${channel}`
+}
+
+const buildDir = appName + '-' + process.platform + '-' + arch
 
 console.log('Writing buildConfig.js...')
 config.writeBuildConfig(
   {
-    channel: env.CHANNEL,
+    channel: channel,
     BROWSER_LAPTOP_REV: require('git-rev-sync').long(),
     nodeEnv: env.NODE_ENV
   },
@@ -51,8 +76,8 @@ var cmds = ['echo cleaning up target...']
 
 if (isWindows) {
   cmds = cmds.concat([
-    '(if exist Brave-win32-x64 rmdir /s /q Brave-win32-x64)',
-    '(if exist Brave-win32-ia32 rmdir /s /q Brave-win32-ia32)'
+    `(if exist ${appName}-win32-x64 rmdir /s /q ${appName}-win32-x64)`,
+    `(if exist ${appName}-win32-ia32 rmdir /s /q ${appName}-win32-ia32)`
   ])
 
   // Remove the destination folder for the selected arch
@@ -69,7 +94,7 @@ if (isWindows) {
   cmds = cmds.concat([
     'rm -Rf ' + buildDir,
     'rm -Rf dist',
-    'rm -f Brave.tar.bz2'
+    `rm -f ${appName}.tar.bz2`
   ])
 }
 
@@ -83,8 +108,8 @@ console.log('Building version ' + VersionInfo.braveVersion + ' in ' + buildDir +
 cmds = cmds.concat([
   '"./node_modules/.bin/webpack"',
   'npm run checks',
-  'node ./node_modules/electron-packager/cli.js . Brave' +
-    ' --overwrite' +
+  `node ./node_modules/electron-packager/cli.js . ${appName}` +
+    ' --overwrite=true' +
     ' --ignore="' + ignoredPaths.join('|') + '"' +
     ' --platform=' + process.platform +
     ' --arch=' + arch +
@@ -95,10 +120,11 @@ cmds = cmds.concat([
     ' --build-version=' + VersionInfo.electronVersion +
     ' --protocol="http" --protocol-name="HTTP Handler"' +
     ' --protocol="https" --protocol-name="HTTPS Handler"' +
+    ` --product-dir-name="${productDirName}"` +
     ' --version-string.CompanyName="Brave Software"' +
-    ' --version-string.ProductName="Brave"' +
+    ` --version-string.ProductName="${appName}"` +
     ' --version-string.Copyright="Copyright 2017, Brave Software"' +
-    ' --version-string.FileDescription="Brave"'
+    ` --version-string.FileDescription="${appName}"`
 ])
 
 function BuildManifestFile () {
@@ -109,10 +135,11 @@ function BuildManifestFile () {
 }
 
 if (isLinux) {
-  cmds.push('mv Brave-linux-x64/Brave Brave-linux-x64/brave')
+  cmds.push(`mv ${appName}-linux-x64/Brave ${appName}-linux-x64/brave`)
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'resources', 'extensions'))
 } else if (isDarwin) {
-  cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'Brave.app', 'Contents', 'Resources', 'extensions'))
+  const macAppName = `${appName}.app`
+  cmds.push('ncp ./app/extensions ' + path.join(buildDir, macAppName, 'Contents', 'Resources', 'extensions'))
 } else if (isWindows) {
   BuildManifestFile()
   cmds.push('move .\\temp.VisualElementsManifest.xml "' + path.join(buildDir, 'resources', 'Update.VisualElementsManifest.xml') + '"')
@@ -121,12 +148,13 @@ if (isLinux) {
   cmds.push('makensis.exe -DARCH=' + arch + ' res/braveDefaults.nsi')
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'resources', 'extensions'))
   // Make sure the Brave.exe binary is squirrel aware so we get squirrel events and so that Squirrel doesn't auto create shortcuts.
-  cmds.push('"node_modules/rcedit/bin/rcedit.exe" ./Brave-win32-' + arch + '/Brave.exe --set-version-string "SquirrelAwareVersion" "1"')
+  cmds.push(`"node_modules/rcedit/bin/rcedit.exe" ./${appName}-win32-` + arch + `/${appName}.exe --set-version-string "SquirrelAwareVersion" "1"`)
 }
 
 if (isDarwin) {
-  cmds.push('mkdirp ' + path.join(buildDir, 'Brave.app', 'Contents', 'Resources', 'app.asar.unpacked', 'node_modules', 'node-anonize2-relic-emscripten'))
-  cmds.push('ncp ' + path.join('node_modules', 'node-anonize2-relic-emscripten', 'anonize2.js.mem') + ' ' + path.join(buildDir, 'Brave.app', 'Contents', 'Resources', 'app.asar.unpacked', 'node_modules', 'node-anonize2-relic-emscripten', 'anonize2.js.mem'))
+  const macAppName = `${appName}.app`
+  cmds.push('mkdirp ' + path.join(buildDir, macAppName, 'Contents', 'Resources', 'app.asar.unpacked', 'node_modules', 'node-anonize2-relic-emscripten'))
+  cmds.push('ncp ' + path.join('node_modules', 'node-anonize2-relic-emscripten', 'anonize2.js.mem') + ' ' + path.join(buildDir, macAppName, 'Contents', 'Resources', 'app.asar.unpacked', 'node_modules', 'node-anonize2-relic-emscripten', 'anonize2.js.mem'))
 } else {
   cmds.push('mkdirp ' + path.join(buildDir, 'resources', 'app.asar.unpacked', 'node_modules', 'node-anonize2-relic-emscripten'))
   cmds.push('ncp ' + path.join('node_modules', 'node-anonize2-relic-emscripten', 'anonize2.js.mem') + ' ' + path.join(buildDir, 'resources', 'app.asar.unpacked', 'node_modules', 'node-anonize2-relic-emscripten', 'anonize2.js.mem'))

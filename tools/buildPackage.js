@@ -55,6 +55,10 @@ switch (channel) {
     throw new Error('CHANNEL environment variable must be set to dev, beta or release')
 }
 
+if (isLinux) {
+  appName = appName.toLowerCase()
+}
+
 var productDirName = 'brave'
 if (channel !== 'release') {
   productDirName += `-${channel}`
@@ -135,7 +139,7 @@ function BuildManifestFile () {
 }
 
 if (isLinux) {
-  cmds.push(`mv ${appName}-linux-x64/Brave ${appName}-linux-x64/brave`)
+  // cmds.push(`mv ${appName}-linux-x64/${appName} ${appName}-linux-x64/${lowerAppName}`)
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'resources', 'extensions'))
 } else if (isDarwin) {
   const macAppName = `${appName}.app`

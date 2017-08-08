@@ -41,7 +41,11 @@ switch (channel) {
     throw new Error('CHANNEL environment variable must be set to dev, beta or release')
 }
 
-const buildDir = 'Brave-' + process.platform + '-' + arch
+if (isLinux) {
+  appName = appName.toLowerCase()
+}
+
+const buildDir = appName + process.platform + '-' + arch
 
 console.log('Building install and update for version ' + VersionInfo.braveVersion + ' in ' + buildDir + ' with Electron ' + VersionInfo.electronVersion)
 
@@ -106,21 +110,21 @@ if (isDarwin) {
     execute(cmds, {}, console.log.bind(null, 'done'))
   }, (e) => console.log(`No dice: ${e.message}`))
 } else if (isLinux) {
-  console.log('Install with sudo dpkg -i dist/brave_' + VersionInfo.braveVersion + '_amd64.deb')
-  console.log('Or install with sudo dnf install dist/brave_' + VersionInfo.braveVersion + '.x86_64.rpm')
+  console.log(`Install with sudo dpkg -i dist/${appName}_` + VersionInfo.braveVersion + '_amd64.deb')
+  console.log(`Or install with sudo dnf install dist/${appName}_` + VersionInfo.braveVersion + '.x86_64.rpm')
   cmds = [
     // .deb file
     'electron-installer-debian' +
       ` --src ${appName}-linux-x64/` +
       ' --dest dist/' +
       ' --arch amd64' +
-      ' --config res/linuxPackaging.json',
+      ` --config res/${channel}/linuxPackaging.json`,
     // .rpm file
     'electron-installer-redhat' +
       ` --src ${appName}-linux-x64/` +
       ' --dest dist/' +
       ' --arch x86_64' +
-      ' --config res/linuxPackaging.json',
+      ` --config res/${channel}/linuxPackaging.json`,
     // .tar.bz2 file
     `tar -jcvf dist/${appName}.tar.bz2 ./${appName}-linux-x64`
   ]

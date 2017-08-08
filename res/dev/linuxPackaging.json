@@ -1,8 +1,10 @@
 {
-  "productName": "Brave",
+  "name": "brave-developer",
+  "bin": "brave-developer",
+  "productName": "Brave Developer",
   "genericName": "Web Browser",
   "homepage": "https://brave.com/",
-  "icon": "res/app.png",
+  "icon": "res/dev/app.png",
   "section": "web",
   "categories": [
     "Network",

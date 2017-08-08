@@ -56,5 +56,6 @@ module.exports = [
   'uglify-js',
   'webdriverio',
   'webpack-dev-server',
-  'Brave-(.+)'
+  'Brave-(.+)',
+  'brave-(.+)'
 ]

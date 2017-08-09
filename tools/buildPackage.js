@@ -20,9 +20,9 @@ var env = {
 
 const channel = env.CHANNEL
 
-var channels = { nightly: true, dev: true, beta: true, release: true }
+var channels = { nightly: true, developer: true, beta: true, dev: true }
 if (!channels[channel]) {
-  throw new Error('CHANNEL environment variable must be set to dev, beta or release')
+  throw new Error('CHANNEL environment variable must be set to developer, beta or dev')
 }
 
 var appIcon
@@ -42,17 +42,17 @@ switch (channel) {
   case 'nightly':
     appName = 'Brave-Nightly'
     break
-  case 'dev':
+  case 'developer':
     appName = 'Brave-Developer'
     break
   case 'beta':
     appName = 'Brave-Beta'
     break
-  case 'release':
+  case 'dev':
     appName = 'Brave'
     break
   default:
-    throw new Error('CHANNEL environment variable must be set to dev, beta or release')
+    throw new Error('CHANNEL environment variable must be set to developer, beta or dev')
 }
 
 if (isLinux) {
@@ -60,7 +60,7 @@ if (isLinux) {
 }
 
 var productDirName = 'brave'
-if (channel !== 'release') {
+if (channel !== 'dev') {
   productDirName += `-${channel}`
 }
 

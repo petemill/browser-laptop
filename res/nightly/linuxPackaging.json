@@ -1,6 +1,7 @@
 {
   "name": "brave-nightly",
   "bin": "brave-nightly",
+  "userDataDir": "brave-nightly",
   "productName": "Brave Nightly",
   "genericName": "Web Browser",
   "homepage": "https://brave.com/",

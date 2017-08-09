@@ -139,7 +139,6 @@ function BuildManifestFile () {
 }
 
 if (isLinux) {
-  // cmds.push(`mv ${appName}-linux-x64/${appName} ${appName}-linux-x64/${lowerAppName}`)
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'resources', 'extensions'))
 } else if (isDarwin) {
   const macAppName = `${appName}.app`

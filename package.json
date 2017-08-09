@@ -192,8 +192,8 @@
     "xml2js": "^0.4.15"
   },
   "optionalDependencies": {
-    "electron-installer-debian": "brave/electron-installer-debian",
-    "electron-installer-redhat": "brave/electron-installer-redhat"
+    "electron-installer-debian": "brave/electron-installer-debian#userDataDir-override",
+    "electron-installer-redhat": "brave/electron-installer-redhat#userDataDir-override"
   },
   "standard": {
     "global": [

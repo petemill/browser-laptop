@@ -1,6 +1,7 @@
 {
   "name": "brave-developer",
   "bin": "brave-developer",
+  "userDataDir": "brave-developer",
   "productName": "Brave Developer",
   "genericName": "Web Browser",
   "homepage": "https://brave.com/",

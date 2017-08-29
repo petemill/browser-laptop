@@ -91,38 +91,38 @@ class ClearBrowsingDataPanel extends React.Component {
         <CommonFormTitle data-l10n-id='clearBrowsingData' />
         <CommonFormSection>
           <SwitchControl
-            rightl10nId='browserHistory'
+            onTextL10nId='browserHistory'
             testId='browserHistorySwitch'
             checkedOn={this.props.browserHistory}
             onClick={this.onToggleBrowserHistory} />
           <SwitchControl
-            rightl10nId='downloadHistory'
+            onTextL10nId='downloadHistory'
             checkedOn={this.props.downloadHistory}
             onClick={this.onToggleDownloadHistory} />
           <SwitchControl
-            rightl10nId='cachedImagesAndFiles'
+            onTextL10nId='cachedImagesAndFiles'
             checkedOn={this.props.cachedImagesAndFiles}
             onClick={this.onToggleCachedImagesAndFiles} />
           <SwitchControl
-            rightl10nId='savedPasswords'
+            onTextL10nId='savedPasswords'
             checkedOn={this.props.savedPasswords}
             onClick={this.onToggleSavedPasswords} />
           <SwitchControl
-            rightl10nId='allSiteCookies'
+            onTextL10nId='allSiteCookies'
             checkedOn={this.props.allSiteCookies}
             onClick={this.onToggleAllSiteCookies} />
           <SwitchControl
-            rightl10nId='autocompleteData'
+            onTextL10nId='autocompleteData'
             testId='autocompleteDataSwitch'
             checkedOn={this.props.autocompleteData}
             onClick={this.onToggleAutocompleteData} />
           <SwitchControl
-            rightl10nId='autofillData'
+            onTextL10nId='autofillData'
             testId='autofillDataSwitch'
             checkedOn={this.props.autofillData}
             onClick={this.onToggleAutofillData} />
           <SwitchControl
-            rightl10nId='savedSiteSettings'
+            onTextL10nId='savedSiteSettings'
             testId='siteSettingsSwitch'
             checkedOn={this.props.savedSiteSettings}
             onClick={this.onToggleSavedSiteSettings} />

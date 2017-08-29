@@ -100,7 +100,7 @@ class WidevinePanel extends React.Component {
             {/* TODO: refactor switchControl.js to remove commonStyles.noPadding */}
             <SwitchControl
               className={css(commonStyles.noPadding)}
-              rightl10nId='rememberThisDecision'
+              onTextL10nId='rememberThisDecision'
               rightl10nArgs={JSON.stringify({origin: this.props.origin})}
               onClick={this.onClickRememberForNetflix}
               checkedOn={this.props.alsoAddRememberSiteSetting} />

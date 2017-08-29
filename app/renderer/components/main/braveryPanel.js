@@ -146,11 +146,11 @@ class BraveryPanel extends React.Component {
         />
         <div className={css(styles.braveryPanel_compact__header__top__right)}>
           <SwitchControl
-            customWrapperClassName={css(styles.braveryPanel_compact__header__top__right__switchControl)}
+            className={css(styles.braveryPanel_compact__header__top__right__switchControl)}
             onClick={this.onToggleShields}
             testId='shields-toggle'
-            leftl10nId='shieldsDown'
-            rightl10nId='shieldsUp'
+            offTextL10nId='shieldsDown'
+            onTextL10nId='shieldsUp'
             checkedOn={this.props.shieldsUp}
           />
           <BrowserButton custom={styles.braveryPanel_compact__header__top__right__close}
@@ -176,14 +176,13 @@ class BraveryPanel extends React.Component {
         <div title={this.props.lastCommittedURL} className={css(styles.braveryPanel__header__left__displayHost)}>{this.props.displayHost}</div>
       </div>
       <div className={css(styles.braveryPanel__header__right)}>
-        <SwitchControl large
-          customWrapperClassName={css(styles.braveryPanel__header__right__switchControl)}
-          customTopTextClassName={css(styles.braveryPanel__header__right__switchControl__topText)}
+        <SwitchControl
+          large
           onClick={this.onToggleShields}
           testId='shields-toggle'
-          leftl10nId='shieldsDown'
-          rightl10nId='shieldsUp'
-          topl10nId='shields'
+          offTextL10nId='shieldsDown'
+          onTextL10nId='shieldsUp'
+          titleTextL10nId='shields'
           checkedOn={this.props.shieldsUp}
         />
       </div>
@@ -519,7 +518,7 @@ class BraveryPanel extends React.Component {
                   this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
                 )}
                   onClick={this.onToggleHTTPSE}
-                  rightl10nId='httpsEverywhere'
+                  onTextL10nId='httpsEverywhere'
                   checkedOn={this.props.httpsEnabled}
                   disabled={!this.props.shieldsUp}
                   testId='httpsEverywhereSwitch'
@@ -531,7 +530,7 @@ class BraveryPanel extends React.Component {
                   this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
                 )}
                   onClick={this.onToggleNoScript}
-                  rightl10nId='noScript'
+                  onTextL10nId='noScript'
                   checkedOn={this.props.noScriptEnabled}
                   disabled={!this.props.shieldsUp}
                   testId='noScriptSwitch'
@@ -596,7 +595,7 @@ class BraveryPanel extends React.Component {
                   this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
                 )}
                   onClick={this.onToggleSafeBrowsing}
-                  rightl10nId='safeBrowsing'
+                  onTextL10nId='safeBrowsing'
                   checkedOn={this.props.safeBrowsing}
                   disabled={!this.props.shieldsUp}
                   testId='safeBrowsingSwitch'
@@ -779,7 +778,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   braveryPanel_compact__header__top__right__switchControl: {
-    padding: '0 25px'
+    margin: '0 25px'
   },
   braveryPanel_compact__header__top__right__close: {
     // ref: https://github.com/brave/browser-laptop/blob/master/app/renderer/components/common/modalOverlay.js#L160
@@ -814,12 +813,6 @@ const styles = StyleSheet.create({
 
   // braveryPanelHeader - Normal Panel
   braveryPanel__header__left__displayHost: displayHost,
-  braveryPanel__header__right__switchControl: {
-    padding: 0
-  },
-  braveryPanel__header__right__switchControl__topText: {
-    color: globalStyles.braveryPanel.header.switchControlTopTextColor
-  },
 
   // braveryPanelStats - Common
   braveryPanel__stats: {

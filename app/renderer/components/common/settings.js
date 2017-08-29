@@ -102,7 +102,7 @@ class SettingCheckbox extends ImmutableComponent {
         checkedOn={this.props.checked !== undefined ? this.props.checked : getSetting(this.props.prefKey, this.props.settings)}
         className={this.props.switchClassName}
         customRightTextClassName={labelClass}
-        rightl10nId={this.props.dataL10nId}
+        onTextL10nId={this.props.dataL10nId}
         rightl10nArgs={this.props.dataL10nArgs}
       />
       {this.props.options}

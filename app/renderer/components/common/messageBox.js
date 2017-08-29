@@ -147,7 +147,7 @@ class MessageBox extends React.Component {
                   commonStyles.noPaddingLeft,
                   styles.switchControl_marginBottom
                 )}
-                rightl10nId='preventMoreAlerts'
+                onTextL10nId='preventMoreAlerts'
                 checkedOn={this.props.suppress}
                 onClick={this.onSuppressChanged} />
               : null

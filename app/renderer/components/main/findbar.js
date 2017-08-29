@@ -280,7 +280,7 @@ class FindBar extends React.Component {
           checkedOn={this.props.isCaseSensitive}
           onClick={this.onCaseSensitivityChange}
           customRightTextClassName={css(findBarTextStyles.matchingTextColor)}
-          rightl10nId='caseSensitivity'
+          onTextL10nId='caseSensitivity'
         />
       </div>
       <span

@@ -119,25 +119,25 @@ class ImportBrowserDataPanel extends React.Component {
             </CommonFormDropdown>
           </div>
           <SwitchControl
-            rightl10nId='browserHistory'
+            onTextL10nId='browserHistory'
             checkedOn={this.props.history}
             onClick={this.onToggleHistory}
             disabled={!this.props.isSupportingHistory}
           />
           <SwitchControl
-            rightl10nId='favoritesOrBookmarks'
+            onTextL10nId='favoritesOrBookmarks'
             checkedOn={this.props.favorites}
             onClick={this.onToggleFavorites}
             disabled={!this.props.isSupportingFavorites}
           />
           <SwitchControl
-            rightl10nId='cookies'
+            onTextL10nId='cookies'
             checkedOn={this.props.cookies}
             onClick={this.onToggleCookies}
             disabled={!this.props.isSupportingCookies}
           />
           <SwitchControl
-            rightl10nId='savedPasswords'
+            onTextL10nId='savedPasswords'
             checkedOn={this.props.passwords}
             onClick={this.onTogglePasswords}
             disabled={!this.props.isSupportingPasswords}

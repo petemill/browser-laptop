@@ -35,6 +35,8 @@ const appDispatcher = require('../../../js/dispatcher/appDispatcher')
 const isDarwin = platformUtil.isDarwin()
 const isWindows = platformUtil.isWindows()
 
+const TIMEOUT_WINDOW_SHOW_MS = 5000
+
 // TODO cleanup all this createWindow crap
 function isModal (browserOpts) {
   // this needs some better checks
@@ -108,7 +110,6 @@ const setMaximized = (state, browserOpts, immutableWindowState) => {
 
 function windowDefaults (state) {
   return {
-    show: false,
     width: state.getIn(['defaultWindowParams', 'width']) || state.get('defaultWindowWidth'),
     height: state.getIn(['defaultWindowParams', 'height']) || state.get('defaultWindowHeight'),
     x: state.getIn(['defaultWindowParams', 'x']) || undefined,
@@ -245,7 +246,52 @@ const createWindow = (state, action) => {
   const toolbarUserInterfaceScale = getSetting(settings.TOOLBAR_UI_SCALE)
 
   setImmediate(() => {
-    const win = new BrowserWindow(Object.assign(windowProps, browserOpts, {disposition: frameOpts.disposition}))
+    // normally macOS will open immediately-created windows from fullscreen
+    // parent windows as fullscreen
+    // but since we are showing the window async, we will set the window
+    // fullscreen once it is ready to be shown
+    // (browserOpts.fullscreen may already be set when loading from saved state,
+    // so this just sets it for other scenarios)
+    if (isDarwin && parentWindow && parentWindow.isFullScreen()) {
+      windowProps.fullscreen = true
+    }
+
+    const defaultArgs = {
+      // hide the window until the window reports that it is rendered
+      show: false,
+      fullscreenable: true
+    }
+    const enforcedArgs = {
+      disposition: frameOpts.disposition
+    }
+    const windowArgs = Object.assign(
+      defaultArgs,
+      windowProps,
+      browserOpts,
+      enforcedArgs
+    )
+    // remember if the window should be opened fullscreen once it is rendered
+    // and remove the fullscreen property for now
+    // (otherwise the window will be shown immediately by the OS / muon)
+    let shouldFullscreen = false
+    if (!windowArgs.show && windowArgs.fullscreen) {
+      windowArgs.fullscreen = false
+      shouldFullscreen = true
+    }
+    const win = new BrowserWindow(windowArgs)
+    // let the windowReady handler know to set the window to fullscreen
+    win.__shouldFullscreen = shouldFullscreen
+    if (!windowArgs.show) {
+      // the window is hidden until render, but we'll check to see
+      // if it is shown in a timeout as if the window errors it won't send
+      // the message to ask to be shown
+      // in those cases, we want to still show it, so that the user can find the error message
+      setTimeout(() => {
+        if (win && !win.isDestroyed() && !win.isVisible()) {
+          win.show()
+        }
+      }, TIMEOUT_WINDOW_SHOW_MS)
+    }
     let restoredImmutableWindowState = action.get('restoredState')
     initWindowCacheState(win.id, restoredImmutableWindowState)
 
@@ -308,10 +354,6 @@ const createWindow = (state, action) => {
       }
     })
 
-    win.on('ready-to-show', () => {
-      win.show()
-    })
-
     win.loadURL(appUrlUtil.getBraveExtIndexHTML())
   })
 
@@ -329,6 +371,9 @@ const windowsReducer = (state, action, immutableAction) => {
       break
     case appConstants.APP_WINDOW_READY:
       windows.windowReady(action.get('windowId'))
+      break
+    case appConstants.APP_WINDOW_RENDERED:
+      windows.windowRendered(action.get('windowId'))
       break
     case appConstants.APP_TAB_UPDATED:
       if (immutableAction.getIn(['changeInfo', 'pinned']) != null) {

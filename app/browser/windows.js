@@ -312,6 +312,27 @@ const api = {
     })
   },
 
+  windowRendered: (windowId) => {
+    setImmediate(() => {
+      const win = currentWindows[windowId]
+      if (win && !win.isDestroyed() && !win.isVisible()) {
+        // window is hidden by default until we receive 'ready' message,
+        // so show it now
+        win.show()
+        if (win.__shouldFullscreen) {
+          // this timeout helps with an issue that
+          // when a user is loading from state, and
+          // has many full screen windows and non fullscreen windows
+          // the non fullscreen windows can get opened on top of the fullscreen
+          // spaces because macOS has switched away from the desktop space
+          setTimeout(() => {
+            win.setFullScreen(true)
+          }, 100)
+        }
+      }
+    })
+  },
+
   closeWindow: (windowId) => {
     let win = api.getWindow(windowId)
     try {

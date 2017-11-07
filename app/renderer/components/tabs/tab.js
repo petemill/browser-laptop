@@ -473,6 +473,7 @@ class Tab extends React.Component {
     props.isPinnedTab = isPinned
     props.isPrivateTab = privateState.isPrivateTab(currentWindow, frameKey)
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frameKey)
+    props.isPreview = frameKey === frameStateUtil.getPreviewFrameKey(currentWindow)
     props.tabWidth = currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
     props.themeColor = tabUIState.getThemeColor(currentWindow, frameKey)
     props.displayIndex = ownProps.displayIndex
@@ -589,6 +590,7 @@ class Tab extends React.Component {
         isDragging: this.props.isDragging,
         isPinned: this.props.isPinnedTab,
         isActive: this.props.isActive,
+        isPreview: this.props.isPreview,
         partOfFullPageSet: this.props.partOfFullPageSet || !!this.props.tabWidth
       })}
       style={this.props.tabWidth && !this.props.isPinnedTab ? { flex: `0 0 ${this.props.tabWidth}px` } : {}}

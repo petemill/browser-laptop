@@ -111,6 +111,7 @@ class Tabs extends React.Component {
     const props = {}
     // used in renderer
     props.previewTabPageIndex = currentWindow.getIn(['ui', 'tabs', 'previewTabPageIndex'])
+    props.previewTabFrameKey = frameStateUtil.getPreviewFrameKey(currentWindow)
     props.currentTabs = currentTabs
     props.partOfFullPageSet = currentTabs.size === tabsPerTabPage
     props.onNextPage = currentTabs.size >= tabsPerTabPage && totalPages > pageIndex + 1
@@ -131,6 +132,10 @@ class Tabs extends React.Component {
 
   render () {
     const isPreview = this.props.previewTabPageIndex != null
+    const isTabPreviewing = this.props.previewTabFrameKey != null
+    const isTabDragging = this.props.draggingTabId != null
+    const tabsShouldEnterAnimate = !isTabDragging && !isTabPreviewing
+    const tabsShouldLeaveAnimate = !isTabDragging && !isTabPreviewing
     return <div
       data-test-tabs
       className='tabs'
@@ -144,25 +149,26 @@ class Tabs extends React.Component {
           delay={0}
           staggerDelayBy={0}
           easing='cubic-bezier(0.23, 1, 0.32, 1)'
-          enterAnimation={this.props.draggingTabId != null ? null : [
+          enterAnimation={tabsShouldEnterAnimate ? [
             {
               transform: 'translateY(50%)'
             },
             {
               transform: 'translateY(0)'
             }
-          ]}
-          leaveAnimation={this.props.draggingTabId != null ? null : [
+          ] : null}
+          leaveAnimation={tabsShouldLeaveAnimate ? [
             {
               transform: 'translateY(0)'
             },
             {
               transform: 'translateY(100%)'
             }
-          ]}
+          ] : null}
           className={cx({
             tabStripContainer: true,
             isPreview,
+            isTabPreviewing,
             allowDragging: this.props.shouldAllowWindowDrag
           })}
           onDragOver={this.onDragOver}

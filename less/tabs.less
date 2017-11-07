@@ -8,7 +8,6 @@
   box-sizing: border-box;
   display: flex;
   flex: 1;
-  overflow: auto;
   padding: 0;
   height: -webkit-fill-available;
   position: relative;
@@ -20,8 +19,11 @@
   display: flex;
   flex: 1;
   z-index: @zindexTabs;
-  overflow-x: hidden;
-  overflow-y: hidden;
+  position: relative;
+  &:not(.isTabPreviewing) {
+    overflow-x: hidden;
+    overflow-y: hidden;
+  }
 
   &.allowDragging {
     -webkit-app-region: drag;
@@ -66,6 +68,7 @@
   border-style: solid;
   border-color: #bbb;
   z-index: 100;
+  transition: box-shadow 0.15s ease-out, transform 0.25s ease;
   // There's a special case that tabs should span the full width
   // if there are a full set of them.
   &:not(.partOfFullPageSet) {
@@ -106,6 +109,20 @@
   &.isActive {
     z-index: 300;
     border-bottom: none;
+  }
+
+  &.isPreview,
+//  &:nth-child(2)
+  {
+    background: white;
+    z-index: 310;
+    transform: scale(1.04);
+    perspective: 500px;
+    perspective-origin: 50% 50%;
+    transform-style: preserve-3d;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    position: relative;
+    border: none;
   }
 
   hr.dragIndicator {

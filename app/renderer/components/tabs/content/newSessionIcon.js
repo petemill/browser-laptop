@@ -112,6 +112,7 @@ const styles = StyleSheet.create({
     backgroundImage: `url(${newSessionSvg})`,
     backgroundPosition: 'center left',
     marginRight: globalStyles.spacing.defaultTabMargin,
+    marginBottom: 'var(--tab-contents-shim-bottom)',
 
     // Override default properties
     backgroundSize: globalStyles.spacing.newSessionIconSize

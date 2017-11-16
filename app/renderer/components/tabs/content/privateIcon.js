@@ -102,6 +102,7 @@ const styles = StyleSheet.create({
     WebkitMaskImage: `url(${privateSvg})`,
     WebkitMaskSize: globalStyles.spacing.sessionIconSize,
     marginRight: globalStyles.spacing.defaultTabMargin,
+    marginBottom: 'var(--tab-contents-shim-bottom)',
 
     // Override default properties
     backgroundSize: 0,

@@ -108,6 +108,7 @@ class CloseTabIcon extends React.Component {
 const styles = StyleSheet.create({
   icon_close: {
     marginRight: globalStyles.spacing.defaultTabMargin,
+    marginBottom: 'var(--tab-contents-shim-bottom)',
     backgroundImage: `url(${closeTabSvg})`,
 
     // Override default properties

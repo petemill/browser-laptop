@@ -849,12 +849,15 @@ class Frame extends React.Component {
     const contextMenu = currentWindow.get('contextMenuDetail')
     const tab = tabId && tabId > -1 && tabState.getByTabId(state, tabId)
 
+    const previewFrameKey = currentWindow.get('previewFrameKey')
+
     const props = {}
     // used in renderer
     props.transitionState = ownProps.transitionState
     props.partition = frameStateUtil.getPartition(frame)
     props.isFullScreen = frame.get('isFullScreen')
-    props.isPreview = frame.get('key') === currentWindow.get('previewFrameKey')
+    props.isPreview = frame.get('key') === previewFrameKey
+    props.siblingIsPreview = props.isPreview ? false : previewFrameKey != null
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frame.get('key'))
     props.showFullScreenWarning = frame.get('showFullScreenWarning')
     props.location = location
@@ -922,6 +925,7 @@ class Frame extends React.Component {
         [this.props.className]: this.props.className,
         [transitionClassName]: transitionClassName,
         isPreview: this.props.isPreview,
+        siblingIsPreview: this.props.siblingIsPreview,
         isActive: this.props.isActive,
         isDefaultNewTabLocation: this.props.isDefaultNewTabLocation,
         isBlankLocation: this.props.isBlankLocation

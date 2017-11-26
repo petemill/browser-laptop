@@ -533,7 +533,6 @@ const api = {
         return
       }
       const tabId = tab.getId()
-
       // command-line flag --debug-tab-events
       if (shouldDebugTabEvents) {
         console.log(`Tab [${tabId}] created in window ${tab.tabValue().windowId}`)
@@ -546,6 +545,9 @@ const api = {
         }
       }
 
+      tab.on('content-blocked', e => {
+      })
+
       tab.on('did-start-navigation', (e, navigationHandle) => {
         if (!tab.isDestroyed() && navigationHandle.isValid() && navigationHandle.isInMainFrame()) {
           const controller = tab.controller()
@@ -556,6 +558,75 @@ const api = {
           if (tabValue) {
             const windowId = tabValue.get('windowId')
             tabActions.didStartNavigation(tabId, createNavigationState(navigationHandle, controller), windowId)
+          }
+        }
+      })
+
+      tab.on('set-active', (e, isActive) => {
+        // fires twice for each change in tab active
+        console.log('set active', tab.getId(), e.sender.id, isActive)
+        updateTab(tab.getId(), { active: isActive })
+        // if isActive and lastActiveIdForWindow !== tab.id
+        // then fire event
+      })
+
+      tab.on('tab-selection-changed', (e) => {
+        console.log("selection changed", e.sender.id)
+      })
+
+      tab.on('guest-ready', e => {
+        // guest instance ID may have changed
+        // frame did: windowActions.frameGuestInstanceIdChanged(this.frame, this.props.guestInstanceId, e.guestInstanceId)
+      })
+      tab.on('context-menu', (...args) => {
+        // don't get the event data here, so ignore
+        console.log('context menu', args)
+      })
+
+      tab.on('page-favicon-updated', e => {
+        // if (e.favicons &&
+        //   e.favicons.length > 0 &&
+          // Favicon changes lead to recalculation of top site data so only fire
+          // this when needed.  Some sites update favicons very frequently.
+          // TODO: fire appAction.setFavicon
+          //   e.favicons[0] !== this.frame.get('icon')) {
+          // imageUtil.getWorkingImageUrl(e.favicons[0], (error) => {
+          //   appActions.setFavicon(tab.id, error ? null : e.favicons[0])
+        // })
+        //}
+      })
+
+      tab.on('show-autofill-settings', e => {
+        let tabValue = getTabValue(tabId)
+        if (tabValue) {
+          const windowId = tabValue.get('windowId')
+          appActions.createTabRequested({
+            windowId,
+            url: 'about:autofill',
+            active: true
+          })
+        }
+      })
+
+      tab.on('ipc-message', (e, [messageName, messageValue]) => {
+        console.log('tab ipc message received', messageName, messageValue)
+      })
+
+      tab.on('ipc-message-host', (e, [messageName, messageValue]) => {
+        console.log('tab ipc host message received', messageName, messageValue)
+        switch (messageName) {
+          case messages.THEME_COLOR_COMPUTED: {
+            const tabId = tab.getId()
+            if (shouldDebugTabEvents) {
+              console.log(`Tab [${tabId}] theme color updated to ${messageValue}`)
+            }
+            const tabValue = getTabValue(tabId)
+            const windowId = tabValue.get('windowId')
+            if (windowId == null) {
+              console.error(`got a theme color for tab ${tabId} which did not have a windowId`)
+            }
+            appActions.setTabThemeColor(windowId, tab.getId(), messageValue)
+            break
           }
         }
       })
@@ -1267,19 +1338,21 @@ const api = {
 
       const oldTabValue = tabState.getByTabId(state, tabId)
       const newTabValue = getTabValue(tabId)
-
+      console.log('update tab state for window')
       // For now the renderer needs to know about index and pinned changes
       // communicate those out here.
       if (newTabValue && oldTabValue) {
         const changeInfo = {}
-        const rendererAwareProps = ['index', 'pinned', 'url', 'active']
+        const rendererAwareProps = ['index', 'pinned', 'url', 'active', 'guestInstanceId']
         rendererAwareProps.forEach((prop) => {
           const newPropVal = newTabValue.get(prop)
           if (oldTabValue.get(prop) !== newPropVal) {
             changeInfo[prop] = newPropVal
           }
         })
+        console.log('update tab state for window')
         if (Object.keys(changeInfo).length > 0) {
+          console.log('got changeinfo', changeInfo)
           updateTab(tabId, changeInfo)
         }
       }
@@ -1294,5 +1367,11 @@ const api = {
     webContentsCache.cleanupWebContents(tabId)
   }
 }
-
+for (const key of Object.keys(api)) {
+  const oldFn = api[key]
+  api[key] = function (...args) {
+    console.log(`tab api: ${key}`)
+    return oldFn(...args)
+  }
+}
 module.exports = api

@@ -38,7 +38,7 @@ const globalStyles = require('../styles/global')
 const {theme} = require('../styles/theme')
 
 // Utils
-const {getTextColorForBackground} = require('../../../../js/lib/color')
+const {backgroundRequiresLightText} = require('../../../../js/lib/color')
 const {isIntermediateAboutPage} = require('../../../../js/lib/appUrlUtil')
 const contextMenus = require('../../../../js/contextMenus')
 const dnd = require('../../../../js/dnd')
@@ -316,7 +316,10 @@ class Tab extends React.Component {
     const isThemed = !this.props.isPrivateTab && this.props.isActive && this.props.themeColor
     const instanceStyles = { }
     if (isThemed) {
-      instanceStyles['--theme-color-fg'] = getTextColorForBackground(this.props.themeColor)
+      instanceStyles['--theme-color-fg'] =
+        backgroundRequiresLightText(this.props.themeColor)
+          ? theme.tab.active.colorLight
+          : theme.tab.active.colorDark
       instanceStyles['--theme-color-bg'] = this.props.themeColor
     }
     if (this.props.tabWidth) {
@@ -334,8 +337,6 @@ class Tab extends React.Component {
         this.props.isPreview && styles.tabArea_isPreview,
         !this.props.isPreview && this.props.anyTabIsPreview && styles.tabArea_siblingIsPreview,
         this.props.isActive && this.props.anyTabIsPreview && styles.tabArea_isActive_siblingIsPreview,
-        // Windows specific style (color)
-        isWindows && styles.tabArea__tab_forWindows,
         // Set background-color and color to active tab and private tab
         this.props.isActive && styles.tabArea_isActive,
         this.props.isPrivateTab && styles.tabArea_private,
@@ -478,23 +479,24 @@ const styles = StyleSheet.create({
   },
 
   tabArea_isActive: {
+    '--tab-color': theme.tab.active.colorDark,
     '--tab-background': theme.tab.active.background,
-    '--border-bottom-color': theme.tab.active.background,
+    '--tab-background-hover': theme.tab.hover.active.background,
     '--tab-border-color-bottom': 'var(--tab-background)',
     '--tab-transit-duration': theme.tab.transitionDurationIn,
     '--tab-transit-easing': theme.tab.transitionEasingIn
   },
 
   tabArea_isPreview: {
-    '--tab-background': 'white',
-    '--tab-background-hover': 'white',
-    '--tab-color': theme.tab.color,
-    '--tab-color-hover': theme.tab.color,
-    '--tab-border-color': 'white',
-    '--tab-border-color-hover': 'white',
+    '--tab-background': theme.tab.preview.background,
+    '--tab-background-hover': theme.tab.preview.background,
+    '--tab-color': theme.tab.active.colorDark,
+    '--tab-color-hover': theme.tab.active.colorDark,
+    '--tab-border-color': theme.tab.preview.background,
+    '--tab-border-color-hover': theme.tab.preview.background,
     zIndex: 110,
-    transform: 'scale(1.08)',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.22)',
+    transform: `scale(${theme.tab.preview.scale})`,
+    boxShadow: theme.tab.preview.boxShadow,
     // want the zindex to change immediately when previewing, but delay when un-previewing
     '--tab-zindex-delay': '0s',
     '--tab-zindex-duration': '0s',
@@ -515,15 +517,9 @@ const styles = StyleSheet.create({
     opacity: '.5'
   },
 
-  tabArea_forWindows: {
-    '--tab-color': theme.tab.forWindows.color
-  },
-
   tabArea_private: {
     '--tab-background': theme.tab.private.background,
-    '--tab-background-hover': theme.tab.active.private.background,
-    '--tab-color-hover': theme.tab.active.private.color,
-    '--tab-border-color-hover': theme.tab.hover.private.borderColor
+    '--tab-background-hover': theme.tab.hover.private.background
   },
 
   tabArea_private_active: {
@@ -566,7 +562,7 @@ const styles = StyleSheet.create({
       left: 0,
       right: 0,
       height: '2px',
-      background: 'lightskyblue'
+      background: theme.tab.icon.audio.color
     }
   },
 

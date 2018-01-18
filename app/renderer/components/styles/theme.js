@@ -48,7 +48,7 @@
     },
 
     tabsToolbar: {
-      backgroundColor: '#ddd',
+      backgroundColor: '#CDD1D5',
 
       border: {
         color: '#bbb'
@@ -141,35 +141,41 @@
       transitionDurationIn: '200ms',
       transitionEasingOut: 'ease-in',
       transitionEasingIn: 'ease-out',
-      background: '#ddd',
+      background: 'rgb(205,209,213)',
       borderColor: '#bbb',
       borderWidth: 1,
-      color: '#5a5a5a',
+      color: '#222',
 
       hover: {
-        background: '#eaeaea',
-
+        background: 'rgb(219,221,223)',
+        active: {
+          background: 'rgb(243,243,243)'
+        },
         private: {
+          background: 'rgb(225,223,238)',
           borderColor: 'rgba(75, 60, 110, .7)'
         }
       },
 
-      forWindows: {
-        color: '#555'
-      },
-
       active: {
-        background: '#f8f8f8',
-
+        background: 'rgb(233,233,234)',
+        colorLight: 'rgb(255, 255, 255)',
+        colorDark: '#222',
         private: {
-          background: '#4b3c6e',
+          background: 'rgb(75,60,110)',
           color: '#fff'
         }
       },
 
       private: {
-        background: '#d9d6e0',
+        background: 'rgb(217,213,228)',
         color: '#4b3c6e'
+      },
+
+      preview: {
+        background: 'rgb(240,240,240)',
+        boxShadow: '0 -2px 12px rgba(0, 0, 0, 0.22)',
+        scale: '1.06'
       },
 
       icon: {
@@ -186,7 +192,7 @@
         },
 
         audio: {
-          color: '#69B9F9'
+          color: '#256ea9'
         },
 
         close: {

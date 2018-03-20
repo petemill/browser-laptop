@@ -69,10 +69,10 @@ const globalStyles = {
     veryLightGray: 'rgb(250, 250, 250)',
     lightGray: 'rgb(236, 236, 236)',
     gray: 'rgb(153, 153, 153)',
-    mediumGray: 'rgb(101, 101, 101)',
-    darkGray: 'rgb(68, 68, 68)',
-    modalVeryLightGray: 'rgb(247, 247, 247)',
-    modalLightGray: 'rgb(231, 231, 231)',
+    mediumGray: 'rgb(101, 101, 107)',
+    darkGray: 'rgb(68, 68, 72)',
+    modalVeryLightGray: 'rgb(247, 247, 255)',
+    modalLightGray: 'rgb(231, 231, 243)',
     white25: 'rgba(255, 255, 255, 0.25)',
     white50: 'rgba(255, 255, 255, 0.5)',
     white100: 'rgba(255, 255, 255, 1)',
@@ -349,7 +349,7 @@ const globalStyles = {
 
     header: {
       color: '#fafafa',
-      background: '#808080',
+      background: 'rgb(128, 128, 135)',
       switchControlTopTextColor: '#d3d3d3',
       border: '1px solid #aaa'
     },
@@ -359,10 +359,10 @@ const globalStyles = {
     },
 
     body: {
-      background: '#eee',
+      background: 'rgb(238, 238, 242)',
 
       hr: {
-        background: '#ccc'
+        background: 'rgb(204, 204, 214)'
       }
     }
   },

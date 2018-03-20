@@ -280,5 +280,13 @@
           backgroundColor: '#fff'
         }
       }
+    },
+
+    preferences: {
+      navigationBackground: `linear-gradient(
+        rgb(164, 167, 171),
+        rgb(94, 96, 99)
+      )`,
+      navigationSectionSelectedColor: 'rgb(101, 101, 107)'
     }
   }

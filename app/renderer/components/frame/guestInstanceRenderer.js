@@ -3,7 +3,9 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
+// comment out to not use pooled webview (2x webviews):
 const WebviewDisplay = require('../../pooledWebviewDisplay')
+// uncomment in to use 1x webview (for debugging):
 // const WebviewDisplay = require('../../webviewDisplay')
 
 // Actions

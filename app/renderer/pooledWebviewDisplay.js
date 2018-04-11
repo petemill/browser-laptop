@@ -8,16 +8,6 @@ const debounce = require('../../js/lib/debounce')
 
 let i = 0
 
-function ensurePaintWebviewFirstAttach (webview, cb = () => {}) {
-  window.requestAnimationFrame(() => {
-    webview.style.display = 'none'
-    window.requestAnimationFrame(() => {
-      webview.style.display = ''
-      window.requestAnimationFrame(cb)
-    })
-  })
-}
-
 function ensurePaintWebviewSubsequentAttach (webview, cb = () => {}) {
   webview.style.top = '1px'
   window.requestAnimationFrame(() => {
@@ -165,7 +155,6 @@ module.exports = class WebviewDisplay {
 
     this.attachingToTabId = tabId
     const t0 = window.performance.now()
-    let timeoutHandleBumpView = null
     const fnEnd = () => {
       if (this.shouldLogEvents) {
         console.groupEnd()
@@ -179,7 +168,7 @@ module.exports = class WebviewDisplay {
       // size has changed or forced to.
       if (!toAttachWebview.isSubsequentAttach) {
         toAttachWebview.isSubsequentAttach = true
-        ensurePaintWebviewFirstAttach(toAttachWebview, showAttachedView)
+        showAttachedView()
       } else {
         ensurePaintWebviewSubsequentAttach(toAttachWebview, showAttachedView)
       }
@@ -290,7 +279,6 @@ module.exports = class WebviewDisplay {
         case 'will-destroy':
         case 'destroyed':
           // don't need to bump view
-          clearTimeout(timeoutHandleBumpView)
           remote.unregisterEvents(tabId, tabEventHandler)
           onDestroyedInsteadOfAttached()
           break
@@ -302,7 +290,6 @@ module.exports = class WebviewDisplay {
           // we're done displaying
           if (!handled) {
             // don't need to bump view
-            clearTimeout(timeoutHandleBumpView)
             onToAttachDidAttach()
             handled = true
           }
@@ -331,8 +318,6 @@ module.exports = class WebviewDisplay {
       // setImmediate is a bit of a hacky way to ensure that registerEvents handler is registered
       setImmediate(() => toAttachWebview.attachGuest(guestInstanceId, webContents))
       this.debugLog(`swapWebviewOnAttach: Waiting.... ${window.performance.now() - t0}ms`)
-      // another workaround for not getting did-attach on webview, set a timeout and then hide / show view
-      timeoutHandleBumpView = window.setTimeout(ensurePaintWebviewFirstAttach.bind(null, toAttachWebview), 2000)
     })
   }
 

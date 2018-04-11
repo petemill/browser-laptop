@@ -202,8 +202,7 @@ module.exports = class WebviewDisplay {
       // At the point where we are attached to the guest we *still* want to be displaying.
       // So, show it.
       toAttachWebview.classList.add(this.classNameWebviewAttaching)
-      // (takes about 3 frames to paint fully and avoid a white flash)
-      await animationFrame()
+      // (takes about 2 frames to paint fully and avoid a white flash)
       await animationFrame()
       await animationFrame()
       this.debugLog('swapWebviewOnAttach: unregisterEvents', tabId)

@@ -46,7 +46,7 @@ function getTab (tabId) {
   return appStore.state.get('tabs').find((tab) => tab.get('tabId') === tabId)
 }
 
-const eventsWithNoAction = ['tab-inserted-at']
+const eventsWithNoAction = ['tab-inserted-at', 'will-destroy', 'destroyed']
 
 const api = module.exports = {
   handleTabEvent (tabId, eventType, e, shouldDebug = false, frame = getFrameByTabId(tabId)) {

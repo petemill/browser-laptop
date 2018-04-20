@@ -8,14 +8,6 @@ const debounce = require('../../js/lib/debounce')
 
 let i = 0
 
-function ensurePaintWebviewSubsequentAttach (webview, cb = () => {}) {
-  webview.style.top = '1px'
-  window.requestAnimationFrame(() => {
-    webview.style.top = ''
-    cb()
-  })
-}
-
 const animationFrame = () => new Promise(window.requestAnimationFrame)
 
 module.exports = class WebviewDisplay {
@@ -160,19 +152,6 @@ module.exports = class WebviewDisplay {
         console.groupEnd()
       }
     }
-    // fn for guest did attach, and workaround to force paint
-    const onToAttachDidAttach = () => {
-      this.debugLog(`swapWebviewOnAttach: webview did-attach ${window.performance.now() - t0}ms`)
-      // TODO(petemill) remove ugly workaround as <webview>
-      // will often not paint guest unless
-      // size has changed or forced to.
-      if (!toAttachWebview.isSubsequentAttach) {
-        toAttachWebview.isSubsequentAttach = true
-        showAttachedView()
-      } else {
-        ensurePaintWebviewSubsequentAttach(toAttachWebview, showAttachedView)
-      }
-    }
 
     // fn for smoothly hiding the previously active view before showing this one
     const showAttachedView = async () => {
@@ -203,8 +182,8 @@ module.exports = class WebviewDisplay {
       // So, show it.
       toAttachWebview.classList.add(this.classNameWebviewAttaching)
       // (takes about 2 frames to paint fully and avoid a white flash)
-      await animationFrame()
-      await animationFrame()
+      // await animationFrame()
+      // await animationFrame()
       this.debugLog('swapWebviewOnAttach: unregisterEvents', tabId)
       remote.unregisterEvents(tabId, tabEventHandler)
       this.debugLog(`swapWebviewOnAttach: webview finished waiting for paint, showing... ${window.performance.now() - t0}ms`)
@@ -288,9 +267,9 @@ module.exports = class WebviewDisplay {
           // when did-detach happens after did-attach but before
           // we're done displaying
           if (!handled) {
-            // don't need to bump view
-            onToAttachDidAttach()
             handled = true
+            // don't need to bump view
+            showAttachedView()
           }
           break
         case 'did-detach':

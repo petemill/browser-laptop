@@ -30,17 +30,9 @@ module.exports = class SingleWebviewDisplay {
       if (!webContents || webContents.isDestroyed()) {
         return
       }
-      this.webview.attachGuest(webContents.guestInstanceId)
+      this.webview.attachGuest(webContents.guestInstanceId, webContents)
     })
     this.isAttached = true
-    // TODO(petemill) remove ugly workaround as <webview> will often not paint guest unless
-    // size has changed or forced to.
-    if (!this.isSubsequent) {
-      this.isSubsequent = true
-      ensurePaintWebviewFirstAttach(this.webview)
-    } else {
-      ensurePaintWebviewSubsequentAttach(this.webview)
-    }
   }
 
   createWebview () {

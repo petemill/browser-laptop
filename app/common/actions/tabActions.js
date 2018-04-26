@@ -35,6 +35,13 @@ const tabActions = {
         windowId
       }
     })
+  },
+
+  didChangeNavigationProgress: (tabId, progressPercent) => {
+    dispatchAction(tabActionConstants.NAVIGATION_PROGRESS_CHANGED, {
+      tabId,
+      progressPercent
+    })
   }
 }
 

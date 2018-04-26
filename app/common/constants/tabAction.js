@@ -5,5 +5,6 @@
  module.exports = {
    RELOAD: 'tabActionsReload',
    FINISH_NAVIGATION: 'tabActionsDidFinishNavigation',
-   START_NAVIGATION: 'tabActionsDidStartNavigation'
+   START_NAVIGATION: 'tabActionsDidStartNavigation',
+   NAVIGATION_PROGRESS_CHANGED: 'tabActionsDidChangeNavigationProgress'
  }

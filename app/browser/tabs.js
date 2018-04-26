@@ -614,6 +614,11 @@ const api = {
         appActions.tabMoved(tabId)
       })
 
+      tab.on('load-progress-changed', (e, progress) => {
+        console.log(`[${tabId}] load-progress: ${progress}`)
+        tabActions.didChangeNavigationProgress(tabId, progress * 100)
+      })
+
       tab.on('will-attach', (e, windowWebContents) => {
         appActions.tabWillAttach(tab.getId())
       })

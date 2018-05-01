@@ -167,7 +167,7 @@ class FindBar extends React.Component {
   }
 
   onFindHide () {
-    frameStateUtil.onFindBarHide(this.props.activeFrameKey)
+    frameStateUtil.onFindBarHide(this.props.activeFrameKey, this.props.activeTabId)
   }
 
   onFind (searchString, caseSensitivity, forward, findNext) {

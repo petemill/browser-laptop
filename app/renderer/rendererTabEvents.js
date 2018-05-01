@@ -386,12 +386,14 @@ function loadEnd (tabId, frame, savePage, url, inPageNav) {
   if (!isPrivate && (protocol === 'http:' || protocol === 'https:') && !isError && savePage && !inPageNav) {
     // Register the site for recent history for navigation bar
     // calling with setTimeout is an ugly hack for a race condition
-    // with setTitle. We either need to delay this call until the title is
-    // or add a way to update it
+    // with setTitle and setFavicon.
+    // We either need to delay this call until the title and favicon are set,
+    // or add a way to update it.
     // However, it's possible that the frame could be destroyed, or in a bad
     // way by then, so make sure we do a null check.
     setTimeout(() => {
-      const siteDetail = historyUtil.getDetailFromFrame(frame)
+      const currentFrame = getFrameByTabId(tabId)
+      const siteDetail = historyUtil.getDetailFromFrame(currentFrame)
       if (siteDetail) {
         appActions.addHistorySite(siteDetail)
       } else if (process.env.NODE_ENV !== 'production') {

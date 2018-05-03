@@ -223,6 +223,13 @@ const tabState = {
     return tab != null ? !!tab.get('pinned') : false
   },
 
+  isTabDiscarded: (state, tabId) => {
+    state = validateState(state)
+    tabId = validateId('tabId', tabId)
+    const tab = tabState.getByTabId(state, tabId)
+    return tab != null ? !!tab.get('discarded') : false
+  },
+
   getNonPinnedTabs: (state) => {
     state = validateState(state)
     return state.get('tabs').filter((tab) => !tab.get('pinned'))
